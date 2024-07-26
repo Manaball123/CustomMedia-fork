@@ -82,7 +82,7 @@ class MyServer:
                 return iter([check_resp.content])
             if check_resp.status_code == 429:
                 self.start_response("429 Rate-limited", [("Error", "stop spamming this")])
-                return iter(["test".encode('utf-8')])
+                return iter([check_resp.content])
             return self.bad_request_400_resp()
         #now upload thingy
         query_params = self.environ['QUERY_STRING']
@@ -117,8 +117,8 @@ class MyServer:
     def __iter__(self):
         endpoint = self.environ['PATH_INFO'].split('/')
         #TODO: add check for valid endpoints here
-        #if(len(endpoint) < 5):
-        #    return self.bad_request_400_resp()
+        if(len(endpoint) < 5):
+            return self.bad_request_400_resp()
         
         if endpoint[4] == "upload":
             return self.delegate_upload()
