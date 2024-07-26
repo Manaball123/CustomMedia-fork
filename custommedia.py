@@ -76,10 +76,10 @@ class MyServer:
             #TODO: forward responses here
             if check_resp.status_code == 403:
                 self.start_response("403 Forbidden", [("Error", "ur token is le bad")])
-                return check_resp.content
+                return [check_resp.content]
             if check_resp.status_code == 429:
                 self.start_response("429 Rate-limited", [("Error", "stop spamming this")])
-                return check_resp.content
+                return [check_resp.content]
             return self.bad_request_400_resp()
         #now upload thingy
         query_params = self.environ['QUERY_STRING']
@@ -102,12 +102,12 @@ class MyServer:
         #TODO: also forward this resp
         if upload_resp.status_code == 429:
             self.start_response("429 Rate-limited", [("Error", "bot was ratelimited but its now your problem")])
-            return upload_resp.content
+            return [upload_resp.content]
         
         if upload_resp.status_code == 200:
             #TODO: respond with content uri(lol)
             self.start_response("200 Success", request_header_to_server_header(upload_resp.headers))
-            return upload_resp.content
+            return [upload_resp.content]
         
             
 
