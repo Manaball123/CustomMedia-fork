@@ -79,7 +79,7 @@ class MyServer:
                 return iter([check_resp.content])
             if check_resp.status_code == 429:
                 self.start_response("429 Rate-limited", [("Error", "stop spamming this")])
-                return iter(["test"])
+                return iter([b"test"])
             return self.bad_request_400_resp()
         #now upload thingy
         query_params = self.environ['QUERY_STRING']
