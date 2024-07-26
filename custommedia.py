@@ -61,8 +61,6 @@ class MyServer:
         
     
     def delegate_upload(self):
-        if self.environ['REQUEST_METHOD'].upper() != 'POST':
-            return self.bad_request_400_resp()
         if not "HTTP_AUTHORIZATION" in self.environ.keys():
             return self.bad_request_400_resp()
         
