@@ -8,6 +8,11 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
 }
 
+def request_header_to_server_header(resp_header : dict) -> list:
+    res = []
+    for k in resp_header.keys():
+        res.append((k, resp_header[k]))
+    return res
 
 class MyServer:
     def __init__(self, environ, start_response):
@@ -82,8 +87,10 @@ class MyServer:
         query_params = self.environ['QUERY_STRING']
         if query_params == None or query_params == "":
             query_params = "filename=file.bin"
-        
-        upload_resp = self.matrix_upload_client._upload_file(query_params.split("=")[1], self.environ['wsgi.input'])
+        #now i COULD probably forward the stream directly but i dont know how to do that so u get this shit instead
+        with open(self.environ['wsgi.input'], "rb") as f:
+            data = f.read()
+        upload_resp = self.matrix_upload_client._upload_file(query_params.split("=")[1], data)
         #even though its the servers fault im still blaming it on client
         if upload_resp.status_code == 403:
             return self.bad_request_400_resp()
@@ -94,7 +101,7 @@ class MyServer:
         
         if upload_resp.status_code == 200:
             #TODO: respond with content uri(lol)
-            self.start_response("200 Success", [])
+            self.start_response("200 Success", request_header_to_server_header(upload_resp.headers))
             return iter([upload_resp.content])
         
             
