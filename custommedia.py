@@ -60,37 +60,43 @@ class MyServer:
     def delegate_upload(self):
         if self.environ['REQUEST_METHOD'].upper() != 'POST':
             return self.bad_request_400_resp()
-        if not "HTTP_Authorization" in self.environ.keys():
+        if not "HTTP_AUTHORIZATION" in self.environ.keys():
             return self.bad_request_400_resp()
-        token = self.environ["HTTP_Authorization"]
+        
+        token = self.environ["HTTP_AUTHORIZATION"]
         check_resp = self.check_token_valid(token)
         if check_resp.status_code != 200:
             #TODO: forward responses here
             if check_resp.status_code == 403:
-                self.start_response("403 Forbidden")
-                return iter([])
+                self.start_response("403 Forbidden", [])
+                return iter([check_resp.content])
             if check_resp.status_code == 429:
-                self.start_response("429 Rate-limited")
-                return iter([])
+                self.start_response("429 Rate-limited", [])
+                return iter([check_resp.content])
             return self.bad_request_400_resp()
         
         #now upload thingy
         #TODO: actually write this
-        upload_resp = self.matrix_upload_client._upload_file()
+        query_params = self.environ['QUERY_STRING']
+        if query_params == None or query_params == "":
+            query_params = "filename=file.bin"
+        
+        upload_resp = self.matrix_upload_client._upload_file(query_params.split("=")[1], self.environ['wsgi.input'])
         #even though its the servers fault im still blaming it on client
         if upload_resp.status_code == 403:
             return self.bad_request_400_resp()
         #TODO: also forward this resp
         if upload_resp.status_code == 429:
-            self.start_response("429 Rate-limited")
-            return iter([])
+            self.start_response("429 Rate-limited", [])
+            return iter([upload_resp.content])
         
         if upload_resp.status_code == 200:
             #TODO: respond with content uri(lol)
-            self.start_response("200 Success")
-            return iter([])
+            self.start_response("200 Success", [])
+            return iter([upload_resp.content])
         
             
+
         
     def __iter__(self):
         endpoint = self.environ['PATH_INFO'].split('/')
