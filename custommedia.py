@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
     options = {
         'bind': 'localhost:9999',
-        'workers': 1,  # Adjust the number of workers based on your system's resources - ChatGPT
+        'workers': 2,  # Adjust the number of workers based on your system's resources - ChatGPT
     }
 
     server = GunicornServer(MyServer, options)
