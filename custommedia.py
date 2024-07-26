@@ -62,7 +62,6 @@ class MyServer:
     
     def delegate_upload(self):
         if not "HTTP_AUTHORIZATION" in self.environ.keys():
-            print("No auth provided for upload")
             self.start_response("403 Forbidden", [])
             return iter([])
         
@@ -72,6 +71,7 @@ class MyServer:
             #TODO: forward responses here
             if check_resp.status_code == 403:
                 self.start_response("403 Forbidden", [])
+                print("Token check invalid")
                 return iter([check_resp.content])
             if check_resp.status_code == 429:
                 self.start_response("429 Rate-limited", [])
