@@ -29,7 +29,7 @@ class MyServer:
             self.matrix_upload_client.login_with_token(cfg.matrix_token)
 
     #heheheh boob
-    def check_token_valid(self, access_token, server_url = "https://localhost:8008"):
+    def check_token_valid(self, access_token, server_url = "http://localhost:8008"):
         resp = requests.post(
             url = f"{server_url}/_matrix/media/v1/create",
             headers={
