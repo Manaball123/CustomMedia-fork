@@ -62,7 +62,9 @@ class MyServer:
     
     def delegate_upload(self):
         if not "HTTP_AUTHORIZATION" in self.environ.keys():
-            return self.bad_request_400_resp()
+            print("No auth provided for upload")
+            self.start_response("403 Forbidden", [])
+            return iter([])
         
         token = self.environ["HTTP_AUTHORIZATION"]
         check_resp = self.check_token_valid(token)
@@ -74,6 +76,7 @@ class MyServer:
             if check_resp.status_code == 429:
                 self.start_response("429 Rate-limited", [])
                 return iter([check_resp.content])
+            print("Token check returned unknown error code")
             return self.bad_request_400_resp()
         
         #now upload thingy
