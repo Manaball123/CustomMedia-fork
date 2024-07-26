@@ -88,8 +88,15 @@ class MyServer:
         if query_params == None or query_params == "":
             query_params = "filename=file.bin"
         #now i COULD probably forward the stream directly but i dont know how to do that so u get this shit instead
-        with open(self.environ['wsgi.input'], "rb") as f:
-            data = f.read()
+        #thanks dude on SO https://stackoverflow.com/questions/530526/accessing-post-data-from-wsgi
+        data = b""
+        try:
+            length = int(self.environ.get('CONTENT_LENGTH', '0'))
+        except ValueError:
+            length = 0
+        if length != 0:
+            data = self.environ['wsgi.input'].read(length)
+
         upload_resp = self.matrix_upload_client._upload_file(query_params.split("=")[1], data)
         #even though its the servers fault im still blaming it on client
         if upload_resp.status_code == 403:
