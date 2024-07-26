@@ -117,12 +117,15 @@ class MyServer:
     def __iter__(self):
         endpoint = self.environ['PATH_INFO'].split('/')
         #TODO: add check for valid endpoints here
+        if(len(endpoint) < 5):
+            return self.bad_request_400_resp()
         
         if endpoint[4] == "upload":
             return self.delegate_upload()
+        if endpoint[4] == "download" or endpoint[4] == "thumbnail":
+            return self.delegate_download()
         
-        return self.delegate_download()
-        
+        return self.bad_request_400_resp()
 
     def load_mappings(self):
         try:
