@@ -21,7 +21,7 @@ class MyServer:
         if cfg.matrix_token == None:
             self.matrix_upload_client.login()
         else:       
-            self.matrix_upload_client.login_with_token(cfg.token)
+            self.matrix_upload_client.login_with_token(cfg.matrix_token)
 
     #heheheh boob
     def check_token_valid(self, access_token, server_url = "https://localhost:8008"):
