@@ -14,6 +14,17 @@ def request_header_to_server_header(resp_header : dict) -> list:
         res.append((k, resp_header[k]))
     return res
 
+#literally didnt refrence self at all
+#heheheh boob
+def check_token_valid(access_token, server_url = "http://localhost:8008"):
+    resp = requests.post(
+        url = f"{server_url}/_matrix/media/v1/create",
+        headers={
+            #no bearer because it would be forwarded too
+            "Authorization" : access_token
+        })
+    return resp
+
 class MyServer:
     def __init__(self, environ, start_response):
         self.environ = environ
@@ -28,15 +39,7 @@ class MyServer:
         else:       
             self.matrix_upload_client.login_with_token(cfg.matrix_token)
 
-    #heheheh boob
-    def check_token_valid(self, access_token, server_url = "http://localhost:8008"):
-        resp = requests.post(
-            url = f"{server_url}/_matrix/media/v1/create",
-            headers={
-                #no bearer because it would be forwarded too
-                "Authorization" : access_token
-            })
-        return resp
+    
     
     def bad_request_400_resp(self):
         self.start_response('400 Bad Request', [])
@@ -71,7 +74,7 @@ class MyServer:
             return iter([])
         
         token = self.environ["HTTP_AUTHORIZATION"]
-        check_resp = self.check_token_valid(token)
+        check_resp = check_token_valid(token)
         if check_resp.status_code != 200:
             #TODO: forward responses here
             if check_resp.status_code == 403:
