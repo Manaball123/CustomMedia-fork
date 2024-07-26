@@ -31,6 +31,10 @@ class MatrixClient:
             self.logged_on = True
             return True
         return False
+    #note that this doesnt check for token validity
+    def login_with_token(self, token : str):
+        self.token = token
+        self.logged_on = True
 
     def _upload_file(self, name : str, data : bytes):
         return requests.post(

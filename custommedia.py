@@ -18,7 +18,10 @@ class MyServer:
         #dont give enough of a shit to make the hs a config
         self.matrix_upload_client = matrix_api.MatrixClient(cfg.matrix_username, cfg. matrix_pass, cfg.matrix_device_id)
         #TODO: share one login token, and maybe pool accounts too
-        self.matrix_upload_client.login()
+        if cfg.matrix_token == None:
+            self.matrix_upload_client.login()
+        else:       
+            self.matrix_upload_client.login_with_token(cfg.token)
 
     #heheheh boob
     def check_token_valid(self, access_token, server_url = "https://localhost:8008"):
