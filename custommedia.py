@@ -81,9 +81,8 @@ class MyServer:
                 self.start_response("429 Rate-limited", [("Error", "stop spamming this")])
                 return iter([check_resp.content])
             return self.bad_request_400_resp()
-        
+        print("hi :DDD")
         #now upload thingy
-        #TODO: actually write this
         query_params = self.environ['QUERY_STRING']
         if query_params == None or query_params == "":
             query_params = "filename=file.bin"
