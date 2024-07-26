@@ -71,7 +71,7 @@ class MyServer:
     def delegate_upload(self):
         if not "HTTP_AUTHORIZATION" in self.environ.keys():
             self.start_response("403 Forbidden", [("Error", "give token >:(")])
-            return iter([])
+            return iter(["hi".encode("utf-8")])
         
         token = self.environ["HTTP_AUTHORIZATION"]
         check_resp = check_token_valid(token)
