@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 import urllib.request
 import json
-
+import matrix_api
+import cfg
+import requests
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
 }
+
 
 class MyServer:
     def __init__(self, environ, start_response):
@@ -12,8 +15,26 @@ class MyServer:
         self.start_response = start_response
         self.mapping_file = 'mapping.json'
         self.mappings = self.load_mappings()
+        #dont give enough of a shit to make the hs a config
+        self.matrix_upload_client = matrix_api.MatrixClient(cfg.matrix_username, cfg. matrix_pass, cfg.matrix_device_id)
+        #TODO: share one login token, and maybe pool accounts too
+        self.matrix_upload_client.login()
 
-    def __iter__(self):
+    #heheheh boob
+    def check_token_valid(self, access_token, server_url = "https://localhost:8008"):
+        resp = requests.post(
+            url = f"{server_url}/_matrix/media/v1/create",
+            headers={
+                #no bearer because it would be forwarded too
+                "Authorization" : access_token
+            })
+        return resp
+    
+    def bad_request_400_resp(self):
+        self.start_response('400 Bad Request', [])
+        return iter([])
+    
+    def delegate_download(self):
         hs = self.environ['PATH_INFO'].split('/')[5]
         hsu = self.mappings.get(hs)
 
@@ -34,6 +55,52 @@ class MyServer:
         hsp = hsu + self.environ['PATH_INFO'] + '?' + self.environ['QUERY_STRING']
         self.start_response('301 Moved Permanently', [('Location', hsp)])
         return iter([])
+        
+    
+    def delegate_upload(self):
+        if self.environ['REQUEST_METHOD'].upper() != 'POST':
+            return self.bad_request_400_resp()
+        if not "HTTP_Authorization" in self.environ.keys():
+            return self.bad_request_400_resp()
+        token = self.environ["HTTP_Authorization"]
+        check_resp = self.check_token_valid(token)
+        if check_resp.status_code != 200:
+            #TODO: forward responses here
+            if check_resp.status_code == 403:
+                self.start_response("403 Forbidden")
+                return iter([])
+            if check_resp.status_code == 429:
+                self.start_response("429 Rate-limited")
+                return iter([])
+            return self.bad_request_400_resp()
+        
+        #now upload thingy
+        #TODO: actually write this
+        upload_resp = self.matrix_upload_client._upload_file()
+        #even though its the servers fault im still blaming it on client
+        if upload_resp.status_code == 403:
+            return self.bad_request_400_resp()
+        #TODO: also forward this resp
+        if upload_resp.status_code == 429:
+            self.start_response("429 Rate-limited")
+            return iter([])
+        
+        if upload_resp.status_code == 200:
+            #TODO: respond with content uri(lol)
+            self.start_response("200 Success")
+            return iter([])
+        
+            
+        
+    def __iter__(self):
+        endpoint = self.environ['PATH_INFO'].split('/')
+        #TODO: add check for valid endpoints here
+        
+        if endpoint[4] == "upload":
+            return self.delegate_upload()
+        
+        return self.delegate_download()
+        
 
     def load_mappings(self):
         try:
@@ -64,7 +131,7 @@ if __name__ == "__main__":
 
     options = {
         'bind': 'localhost:9999',
-        'workers': 32,  # Adjust the number of workers based on your system's resources - ChatGPT
+        'workers': 1,  # Adjust the number of workers based on your system's resources - ChatGPT
     }
 
     server = GunicornServer(MyServer, options)

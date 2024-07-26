@@ -3,9 +3,9 @@ import requests
 
 
 class MatrixClient:
-    def __init__(self, username, password, device_id) -> None:
+    def __init__(self, username, password, device_id, hs_url = "https://matrix.org") -> None:
         self.logged_on = False
-        self.hs_url = "https://matrix.org"
+        self.hs_url = hs_url
         self.username : str= username
         self.password : str = password
         self.device_id : str = device_id
@@ -32,7 +32,15 @@ class MatrixClient:
             return True
         return False
 
-
+    def _upload_file(self, name : str, data : bytes):
+        return requests.post(
+                        url = f"{self.hs_url}/_matrix/media/v3/upload",
+                        data=data, 
+                        params={"filename" : name}, 
+                        headers={
+                            'Content-Type': 'application/octet-stream',
+                            "Authorization" : f"Bearer {self.token}"
+                            })
 
     #does not modify state of client, aka threadsafe(probably)
     def upload_file(self, name : str, data : bytes = None) -> str:
@@ -41,12 +49,8 @@ class MatrixClient:
         if data == None:
             with open(name, "rb") as f:
                 data = f.read()
-        resp = requests.post(
-                        url = f"{self.hs_url}/_matrix/media/v3/upload",
-                        data=data, 
-                        params={"filename" : name}, 
-                        headers={
-                            'Content-Type': 'application/octet-stream',
-                            "Authorization" : f"Bearer {self.token}"
-                            })
+        resp = self._upload_file(name, data)
+        if resp.status_code != 200:
+            return str(resp.status_code)
         return resp.json()["content_uri"]
+        
