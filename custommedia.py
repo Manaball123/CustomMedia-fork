@@ -107,7 +107,7 @@ class MyServer:
         if upload_resp.status_code == 200:
             #TODO: respond with content uri(lol)
             self.start_response("200 Success", request_header_to_server_header(upload_resp.headers))
-            return iter([upload_resp.content])
+            return upload_resp.content
         
             
 
