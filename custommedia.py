@@ -62,18 +62,18 @@ class MyServer:
     
     def delegate_upload(self):
         if not "HTTP_AUTHORIZATION" in self.environ.keys():
-            self.start_response("403 Forbidden")
-            return iter(["give token >:("])
+            self.start_response("403 Forbidden", [("Error", "give token >:(")])
+            return iter([])
         
         token = self.environ["HTTP_AUTHORIZATION"]
         check_resp = self.check_token_valid(token)
         if check_resp.status_code != 200:
             #TODO: forward responses here
             if check_resp.status_code == 403:
-                self.start_response("403 Forbidden")
+                self.start_response("403 Forbidden", [("Error", "ur token is le bad")])
                 return iter([check_resp.content])
             if check_resp.status_code == 429:
-                self.start_response("429 Rate-limited")
+                self.start_response("429 Rate-limited", [("Error", "stop spamming this")])
                 return iter([check_resp.content])
             return self.bad_request_400_resp()
         
@@ -89,7 +89,7 @@ class MyServer:
             return self.bad_request_400_resp()
         #TODO: also forward this resp
         if upload_resp.status_code == 429:
-            self.start_response("429 Rate-limited", ["bot was ratelimited but its now your problem"])
+            self.start_response("429 Rate-limited", [("Error", "bot was ratelimited but its now your problem")])
             return iter([upload_resp.content])
         
         if upload_resp.status_code == 200:
