@@ -10,10 +10,16 @@ headers = {
 
 def filter_resp_header(resp_header : list) -> list:
     res = []
-    resp_allowed = ["Content-Type", "Transfer-Encoding", "Cache-Control", "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers", "Access-Control-Expose-Headers"]
+    resp_allowed = ["content-type",
+                    "transfer-encoding",
+                    "cache-control", 
+                    "access-control-allow-origin", 
+                    "access-control-allow-methods", 
+                    "access-control-allow-headers", 
+                    "access-control-expose-headers"]
 
     for k, v in resp_header:
-        if k in resp_allowed:
+        if k.lower() in resp_allowed:
             res.append((k, v))
     return res
 
