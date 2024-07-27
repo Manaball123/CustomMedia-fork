@@ -86,12 +86,11 @@ class MyServer:
         check_resp = check_token_valid(token)
         
         if check_resp.status_code != 200:
-            #TODO: forward responses here
             if check_resp.status_code == 403:
-                self.start_response("403 Forbidden", [("Error", "ur token is le bad")])
+                self.start_response("403 Forbidden", filter_resp_header(check_resp.headers.items()))
                 return iter([check_resp.content])
             if check_resp.status_code == 429:
-                self.start_response("429 Rate-limited", [("Error", "stop spamming this")])
+                self.start_response("429 Rate-limited", filter_resp_header(check_resp.headers.items()))
                 return iter([check_resp.content])
             return self.bad_request_400_resp()
         #now upload thingy
