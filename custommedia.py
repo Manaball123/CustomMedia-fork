@@ -119,7 +119,7 @@ class MyServer:
             return iter([upload_resp.content])
         
         if upload_resp.status_code == 200:
-            self.start_response("200 Success", upload_resp.headers.items())
+            self.start_response("200 Success", filter_resp_header(upload_resp.headers.items()))
             return iter([upload_resp.content])
         
             
