@@ -110,7 +110,7 @@ class MyServer:
             return iter([upload_resp.content])
         
         if upload_resp.status_code == 200:
-            self.start_response("200 Success")
+            self.start_response("200 Success", [])
             return iter([upload_resp.content])
         
             
