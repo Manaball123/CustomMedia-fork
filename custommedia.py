@@ -84,8 +84,7 @@ class MyServer:
         
         token = self.environ["HTTP_AUTHORIZATION"]
         check_resp = check_token_valid(token)
-        check_resp.status_code = 200
-        #for debug only lol
+        
         if check_resp.status_code != 200:
             #TODO: forward responses here
             if check_resp.status_code == 403:
