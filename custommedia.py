@@ -8,10 +8,13 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
 }
 
-def request_header_to_server_header(resp_header : dict) -> list:
+def filter_resp_header(resp_header : list) -> list:
     res = []
-    for k in resp_header.keys():
-        res.append((k, resp_header[k]))
+    resp_allowed = ["Content-Type", "Transfer-Encoding", "Cache-Control", "Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Access-Control-Allow-Headers", "Access-Control-Expose-Headers"]
+
+    for k, v in resp_header:
+        if k in resp_allowed:
+            res.append((k, v))
     return res
 
 #literally didnt refrence self at all
@@ -110,7 +113,7 @@ class MyServer:
             return iter([upload_resp.content])
         
         if upload_resp.status_code == 200:
-            self.start_response("200 Success", [])
+            self.start_response("200 Success", filter_resp_header(upload_resp.headers))
             return iter([upload_resp.content])
         
             
