@@ -111,6 +111,7 @@ class MyServer:
         
         if upload_resp.status_code == 200:
             self.start_response("200 Success", request_header_to_server_header(upload_resp.headers))
+            raise Exception(upload_resp.content.decode("utf-8"))
             return iter([upload_resp.content])
         
             
