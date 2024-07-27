@@ -27,7 +27,7 @@ def filter_resp_header(resp_header : list) -> list:
 #heheheh boob
 def check_token_valid(access_token, server_url = "http://localhost:8008"):
     resp = requests.post(
-        url = f"{server_url}/_matrix/media/v1/create",
+        url = f"{server_url}/_matrix/media/v3/upload",
         headers={
             #no bearer because it would be forwarded too
             "Authorization" : access_token
