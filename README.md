@@ -18,6 +18,28 @@ add_header 'Access-Control-Allow-Credentials' 'true';
 add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
 add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
 }
+``` 
+heres my updated config im too lazy to document it so just use it for reference 
+```
+    location ~ ^/_matrix/media/(?<folder>[^/]+)/((download|thumbnail)/(?!(schizo\.vip)/))(?<file>.*)$ {
+        proxy_pass http://localhost:9999;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header "Referrer Policy" "";
+        proxy_read_timeout 3600s;
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+    }
+    location ~ ^\/_matrix\/media\/.*\/upload$ {
+        proxy_pass http://localhost:9999;
+        proxy_read_timeout 3600s;
+        client_max_body_size 80M;
+        limit_except POST {
+            proxy_pass http://localhost:8008;
+            
+        }
+   }
 ```
 
 # systemd Service
