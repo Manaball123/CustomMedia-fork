@@ -83,6 +83,11 @@ class MyServer:
             return iter(["hi".encode("utf-8")])
         
         token = self.environ["HTTP_AUTHORIZATION"]
+        if "CONTENT_TYPE" in self.environ:
+            ctype = self.environ["CONTENT_TYPE"]
+        else:
+            #redundant but whatever
+            ctype = 'application/octet-stream'
         check_resp = check_token_valid(token)
         
         if check_resp.status_code != 200:
@@ -105,9 +110,10 @@ class MyServer:
         except ValueError:
             length = 0
         if length != 0:
-            data = self.environ['wsgi.input'].read(length)
+            data = self.environ['wsgi.input'].read(length)   
 
-        upload_resp = self.matrix_upload_client._upload_file(query_params.split("=")[1], data)
+    
+        upload_resp = self.matrix_upload_client._upload_file(query_params.split("=")[1], data, content_type=ctype)
         #even though its the servers fault im still blaming it on client
         if upload_resp.status_code == 403:
             return self.bad_request_400_resp()

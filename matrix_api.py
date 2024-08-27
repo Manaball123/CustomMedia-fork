@@ -36,13 +36,13 @@ class MatrixClient:
         self.token = token
         self.logged_on = True
 
-    def _upload_file(self, name : str, data : bytes):
+    def _upload_file(self, name : str, data : bytes, content_type='application/octet-stream'):
         return requests.post(
                         url = f"{self.hs_url}/_matrix/media/v3/upload",
                         data=data, 
                         params={"filename" : name}, 
                         headers={
-                            'Content-Type': 'application/octet-stream',
+                            'Content-Type': content_type,
                             "Authorization" : f"Bearer {self.token}"
                             })
 
