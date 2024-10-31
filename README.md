@@ -55,11 +55,13 @@ Type=simple
 Restart=always
 RestartSec=5
 User=root
-WorkingDirectory=/opt
-ExecStart=/opt/custommedia.py
+WorkingDirectory=/opt/CustomMedia-fork
+ExecStart=/opt/CustomMedia-fork/custommedia.py
 
 [Install]
 WantedBy=multi-user.target
+
+
 ```
 
 # Mappings
